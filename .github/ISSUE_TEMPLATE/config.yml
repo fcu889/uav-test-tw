@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Official CAA remote drone information
+    url: https://drone.caa.gov.tw/
+    about: Check official remote drone management information.

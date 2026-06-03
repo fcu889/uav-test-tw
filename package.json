@@ -1,0 +1,10 @@
+{
+  "name": "uav-test-tw",
+  "version": "1.0.0",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "validate": "node tools/validate-site.mjs"
+  },
+  "devDependencies": {}
+}

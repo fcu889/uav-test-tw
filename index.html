@@ -1,0 +1,674 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>全國無人機測驗中心 (模擬與題庫)</title>
+    <meta name="description" content="全國無人機測驗中心提供台灣無人機普通操作證、專業操作證與屆期換證題庫練習、模擬測驗、考照指南與法規解析。">
+    <link rel="canonical" href="https://uav-test.tw/">
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --secondary: #f8fafc;
+            --success: #16a34a;
+            --success-bg: #dcfce7;
+            --danger: #dc2626;
+            --danger-bg: #fee2e2;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body.dark-mode {
+            --primary: #38bdf8;
+            --primary-hover: #7dd3fc;
+            --secondary: #1e293b;
+            --success: #4ade80;
+            --success-bg: rgba(74, 222, 128, 0.15);
+            --danger: #f87171;
+            --danger-bg: rgba(248, 113, 113, 0.15);
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+        
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; transition: background-color 0.2s, color 0.2s; }
+        body { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-main); }
+        
+        .header { background: var(--primary); padding: 12px 20px; color: white; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+        .header-actions { display: flex; gap: 8px; }
+        .header-actions button { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
+        .header-actions button:hover { background: rgba(255,255,255,0.3); }
+        .header-actions a { color: white; text-decoration: none; font-weight: 700; font-size: 0.85rem; padding: 6px 8px; border-radius: 6px; }
+        .header-actions a:hover { background: rgba(255,255,255,0.2); }
+        
+        .container { max-width: 800px; margin: 0 auto; padding: 15px; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .title-main { font-size: 1.8rem; font-weight: 800; text-align: center; margin-bottom: 10px; color: var(--text-main); }
+        .subtitle-main { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 1.1rem; }
+        
+        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        @media (max-width: 600px) { .grid-2col { grid-template-columns: 1fr; } }
+        
+        .btn-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px 15px; background: var(--card-bg); border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .btn-card:hover { border-color: var(--primary); background: #f0f9ff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15); }
+        body.dark-mode .btn-card:hover { background: #0c4a6e; }
+        .btn-card h3 { margin: 0 0 10px 0; font-size: 1.25rem; color: var(--primary); }
+        .btn-card p { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+        
+        .btn { width: 100%; padding: 16px; border-radius: 8px; border: none; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+        .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+        .progress-bar-bg { width: 100%; height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; margin-bottom: 20px; }
+        .progress-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+        .q-meta { font-size: 0.9rem; color: var(--primary); font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .q-text { font-size: 1.25rem; font-weight: 700; line-height: 1.5; margin-bottom: 25px; }
+        .opt-label { display: flex; align-items: flex-start; padding: 15px; margin-bottom: 10px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 1.1rem; line-height: 1.4; background: var(--card-bg); }
+        .opt-label:hover:not(.disabled) { background-color: var(--secondary); border-color: var(--text-muted); }
+        .opt-label input { margin-top: 4px; margin-right: 12px; transform: scale(1.3); cursor: pointer; }
+        .is-correct { background-color: var(--success-bg) !important; border-color: var(--success) !important; color: var(--success) !important; font-weight: bold; }
+        .is-wrong { background-color: var(--danger-bg) !important; border-color: var(--danger) !important; color: var(--danger) !important; font-weight: bold; }
+        .is-correct label, .is-wrong label { color: inherit; }
+        .disabled { pointer-events: none; opacity: 0.9; }
+
+        .read-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 15px; position: relative; overflow: hidden; }
+        .read-q { font-size: 1.15rem; font-weight: bold; margin-bottom: 15px; color: var(--text-main); }
+        .read-opt { padding: 8px 12px; margin-bottom: 8px; border-radius: 6px; background: var(--secondary); color: var(--text-muted); font-size: 1rem; position: relative; padding-left: 35px; }
+        
+        .read-correct { background: var(--success-bg); color: var(--success); font-weight: bold; border-left: 4px solid var(--success); }
+        .read-correct::before {
+            content: ''; position: absolute; left: 10px; top: 50%; transform: translateY(-50%) scale(0);
+            width: 14px; height: 14px; background-color: transparent; border-radius: 50%;
+            border: 2px solid #22c55e; box-shadow: 0 0 5px rgba(34, 197, 94, 0.5);
+            animation: popInCheck 0.3s ease-out forwards 0.1s;
+        }
+        @keyframes popInCheck { to { transform: translateY(-50%) scale(1); } }
+        
+        .contact-box { background: var(--secondary); padding: 18px; border-radius: 8px; margin-top: 20px; border: 1px solid var(--border); }
+        .contact-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.95rem; }
+        .contact-icon { font-size: 1.2rem; margin-right: 10px; }
+        .resource-section { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
+        .resource-section h2 { font-size: 1.35rem; margin: 0 0 14px; color: var(--text-main); }
+        .resource-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .resource-link { display: block; padding: 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--secondary); color: var(--text-main); text-decoration: none; }
+        .resource-link strong { display: block; color: var(--primary); margin-bottom: 4px; }
+        .resource-link span { color: var(--text-muted); font-size: 0.9rem; }
+        @media (max-width: 600px) { .resource-grid { grid-template-columns: 1fr; } .header { display: block; } .header-actions { flex-wrap: wrap; margin-top: 8px; } }
+        
+        /* 強化版 SEO 文章區塊樣式 */
+        .seo-article { margin-top: 40px; padding-top: 30px; border-top: 2px dashed var(--border); color: var(--text-main); line-height: 1.8; text-align: justify; }
+        .seo-article h2 { color: var(--primary); font-size: 1.6rem; margin-bottom: 20px; text-align: center; }
+        .seo-article h3 { color: var(--text-main); margin-top: 25px; margin-bottom: 15px; font-size: 1.3rem; border-left: 5px solid var(--primary); padding-left: 12px; }
+        .seo-article p { font-size: 1rem; margin-bottom: 15px; color: var(--text-muted); }
+        .seo-article ul { padding-left: 25px; font-size: 1rem; margin-bottom: 20px; color: var(--text-muted); }
+        .seo-article li { margin-bottom: 10px; }
+        .seo-article strong { color: var(--text-main); }
+    </style>
+</head>
+<body class="light-mode">
+
+    <div class="header">
+        <h1 onclick="app.goHome()">無人機學科題庫</h1>
+        <div class="header-actions">
+            <a href="./guide/basic-drone-license.html">普通證指南</a>
+            <a href="./guide/pro-drone-license.html">專業證指南</a>
+            <a href="./guide/index.html">教學文章</a>
+            <a href="./questions/normal.html">題庫解析</a>
+            <a href="./about.html">關於本站</a>
+            <button onclick="app.toggleDarkMode()" id="dark-mode-btn">🌙 深色模式</button>
+            <button onclick="app.goHome()">回首頁</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="screen-home" class="card">
+            <div class="title-main">全國無人機測驗中心</div>
+            <div class="subtitle-main">依民航局公開題庫整理，提供線上練習與模擬測驗</div>
+            
+            <div class="grid-2col">
+                <div class="btn-card" onclick="app.selectCategory('normal')">
+                    <h3>普通操作證</h3>
+                    <p>適合初次報考自然人</p>
+                </div>
+                <div class="btn-card" onclick="app.selectCategory('pro')">
+                    <h3>專業操作證</h3>
+                    <p>商用空拍、農噴作業</p>
+                </div>
+                <div class="btn-card" onclick="app.selectCategory('normal_renew')">
+                    <h3>屆期換證 (簡易)</h3>
+                    <p>高頻精華題</p>
+                </div>
+                <div class="btn-card" onclick="app.selectCategory('pro_renew')">
+                    <h3>屆期換證 (完整)</h3>
+                    <p>完整題庫+刷題</p>
+                </div>
+            </div>
+
+            <section class="resource-section" aria-labelledby="resources-title">
+                <h2 id="resources-title">考照與法規學習資源</h2>
+                <div class="resource-grid">
+                    <a class="resource-link" href="./guide/index.html"><strong>無人機考照教學文章總覽</strong>
+                        <span>整理考前計畫、常錯題、空域查核、術科準備與安全飛行文章。</span>
+                    </a>
+                    <a class="resource-link" href="./guide/basic-drone-license.html"><strong>普通操作證考照指南</strong>
+                        <span>整理適用對象、準備流程、學科重點與考前檢查。</span>
+                    </a>
+                    <a class="resource-link" href="./guide/pro-drone-license.html"><strong>專業操作證準備指南</strong>
+                        <span>針對商業任務、術科觀念與任務風險管理做說明。</span>
+                    </a>
+                    <a class="resource-link" href="./guide/drone-law.html"><strong>台灣無人機法規白話解析</strong>
+                        <span>說明註冊、證照、空域、活動申請與常見違規風險。</span>
+                    </a>
+                    <a class="resource-link" href="./guide/no-fly-zone.html"><strong>禁航區與空域判斷</strong>
+                        <span>起飛前如何查詢空域、地方公告與現場安全條件。</span>
+                    </a>
+                    <a class="resource-link" href="./guide/safety-checklist.html"><strong>飛行前安全檢查表</strong>
+                        <span>起飛前、飛行中與異常處置的實務檢查清單。</span>
+                    </a>
+                    <a class="resource-link" href="./questions/renew.html"><strong>屆期換證複習重點</strong>
+                        <span>協助已有證照的操作人更新法規與錯題觀念。</span>
+                    </a>
+                    <a class="resource-link" href="./guide/exam-plan-7-days.html"><strong>考前 7 天複習計畫</strong>
+                        <span>安排刷題、錯題整理、完整模擬與考前收斂。</span>
+                    </a>
+                    <a class="resource-link" href="./guide/common-mistakes.html"><strong>普通證常錯題解析</strong>
+                        <span>整理空域、目視飛行、低電量與題目條件判斷。</span>
+                    </a>
+                    <a class="resource-link" href="./guide/practical-test-prep.html"><strong>專業證術科準備</strong>
+                        <span>把術科練習拆成航線、姿態、口令、應變與紀錄。</span>
+                    </a>
+                    <a class="resource-link" href="./guide/coach-class-use.html"><strong>教練課堂使用方式</strong>
+                        <span>提供教練帶學生課前、課中與課後刷題流程。</span>
+                    </a>
+                </div>
+            </section>
+
+            <section class="resource-section" aria-labelledby="static-bank-title">
+                <h2 id="static-bank-title">完整靜態題庫</h2>
+                <div class="resource-grid">
+                    <a class="resource-link" href="./questions/normal-bank.html">
+                        <strong>普通操作證完整題庫</strong>
+                        <span>靜態 HTML 題庫頁，包含題號、章節、選項與正確答案。</span>
+                    </a>
+                    <a class="resource-link" href="./questions/pro-bank.html">
+                        <strong>專業操作證完整題庫</strong>
+                        <span>提供搜尋引擎與使用者可直接讀取的完整題目內容。</span>
+                    </a>
+                    <a class="resource-link" href="./questions/normal-renew-bank.html">
+                        <strong>屆期換證簡易題庫</strong>
+                        <span>適合快速複習換證重點，正式版本請以官方公告為準。</span>
+                    </a>
+                    <a class="resource-link" href="./questions/pro-renew-bank.html">
+                        <strong>屆期換證完整題庫</strong>
+                        <span>完整換證題庫靜態頁，方便查閱與版本比對。</span>
+                    </a>
+                </div>
+            </section>
+
+            <div class="seo-article">
+                <h2>台灣無人機考照指南與法規重點整理</h2>
+                <p>隨著無人機（UAV）技術在空拍、農業植保、物流運輸及公共巡檢等領域的發展，台灣交通部民用航空局（CAA）已建置遙控無人機管理與操作證測驗制度。本網站「全國無人機測驗中心」提供線上學科題庫練習、模擬測驗與考照重點整理。題庫版本、報名流程、費用、考場與法規更新，請以民航局官方公告及遙控無人機管理資訊系統為準。</p>
+
+                <h3>一、 為什麼需要考取無人機操作證？</h3>
+                <p>根據民航法規定，凡是操作重量達一定標準，或涉及「營利行為」、「政府機關業務」的遙控無人機，操作者均須經過測驗合格並取得操作證。未持有合法操作證而違規執行飛行任務，不僅面臨高額罰鍰，若發生飛安事故更需承擔法律責任。考取操作證不僅是守法的表現，更是對飛行安全與專業技術的自我要求。</p>
+
+                <h3>二、 遙控無人機操作證的種類與適用對象</h3>
+                <ul>
+                    <li><strong>學習操作證：</strong> 提供給年滿 16 歲，欲在持有普通或專業操作證者的陪同下，學習無人機操作的初學者申請。免學科與術科測驗。</li>
+                    <li><strong>普通操作證：</strong> 適合一般休閒娛樂的自然人玩家。申請者須年滿 18 歲，且必須通過「學科測驗」。取得後可在日出至日落期間，於符合規定的綠區空域（400呎以下）進行目視飛行。</li>
+                    <li><strong>專業操作證：</strong> 針對欲從事商業空拍、農藥代噴或隸屬法人、政府機關的專業操作手。申請者除須年滿 18 歲外，必須同時通過難度更高的「學科測驗」與「術科測驗」。專業操作證依據無人機重量（如 2kg、25kg、150kg）及構造（多旋翼、定翼機、直昇機）進行分級。</li>
+                </ul>
+
+                <h3>三、 學科測驗重點解析與準備技巧</h3>
+                <p>無人機學科測驗並非只是常識問答，其內容涵蓋了高度專業的航空領域知識。本站題庫精確收錄了官方最新考點，主要包含以下四大單元：</p>
+                <ul>
+                    <li><strong>民用航空法及相關法規：</strong> 佔比最重。考生必須熟記無人機的註冊規定、活動空域限制（紅區、黃區、綠區的劃分）、罰則基準（如違規闖入禁航區面臨 30 萬至 150 萬元罰鍰），以及夜間飛行、人群上空飛行的相關禁止條款。</li>
+                    <li><strong>基礎飛行原理：</strong> 探討多旋翼與定翼機的升力產生機制、重心位置對飛行的影響、以及各類感測器（GPS、IMU、氣壓計）的運作原理與失效排除。</li>
+                    <li><strong>氣象學知識：</strong> 氣象是影響無人機飛安的關鍵。測驗重點包含風切、亂流的形成原因、雲層辨識，以及溫度、大氣壓力對電池效能與馬達升力的實質影響。</li>
+                    <li><strong>緊急處置與飛行決策：</strong> 模擬實務操作中可能遇到的突發狀況，如 GPS 訊號遺失、圖傳斷線、電池電壓驟降時，操作手應採取的標準應變程序（如 RTH 返航機制設定）。</li>
+                </ul>
+
+                <h3>四、 報名資訊與考場注意事項</h3>
+                <ul>
+                    <li><strong>報名管道：</strong> 學科測驗相關報名、異動與成績作業，請至民航局「<a href="https://drone.caa.gov.tw" target="_blank" style="color: var(--primary); text-decoration: none;">遙控無人機管理資訊系統</a>」查詢與辦理。</li>
+                    <li><strong>測驗規範：</strong> 題庫版本、及格標準、測驗方式與費用可能依主管機關公告調整，正式應考前請再次查核官方資料。</li>
+                    <li><strong>考場資訊：</strong> 學科與術科考場、聯絡窗口與場地資訊，請以民航局及遙控無人機管理資訊系統最新公告為準。</li>
+                    <li><strong>應考注意事項：</strong> 考試當日請務必攜帶<strong>具照片之身分證明文件正本</strong>（如身分證、健保卡或駕照）供監考人員查驗。建議提前 15 分鐘抵達考場，測驗期間嚴禁攜帶手機及任何電子通訊設備入座。</li>
+                </ul>
+
+                <h3>五、 屆期換證與持續學習</h3>
+                <p>無人機操作證的有效期限為兩年。效期屆滿前，操作人必須透過線上系統或實體測驗完成「屆期換證」手續。本網站特別為此設立了「換證專區」，提供簡易版與完整版的刷題系統。透過我們獨家導入的 Fisher-Yates 完美亂數洗牌演算法，系統能確保每次模擬測驗都能精準涵蓋法規更新的部分，幫助老飛手快速找回手感，維持專業知識的敏銳度。</p>
+
+                <h3>六、 結語與測驗平台優勢</h3>
+                <p>通過學科測驗是邁向專業飛手的第一步。我們強烈建議考生在正式報考前，反覆利用本站提供的「閱讀模式」進行地毯式背誦，並透過「測驗模式」檢視學習成效。本站支援跨平台淺色與深色模式切換，無論您是使用電腦或手機，都能獲得最舒適、最高效的備考體驗。祝各位飛友考照順利，安全飛行！</p>
+
+                <div class="contact-box" style="margin-top: 30px;">
+                    <strong style="color: var(--text-main); display: block; margin-bottom: 10px;">聯絡我們 (商務合作 / 題庫錯誤回報)</strong>
+                    <div class="contact-item">
+                        <span class="contact-icon">✉️</span>
+                        <a href="mailto:joe94316186@gmail.com" style="color: var(--primary); text-decoration: none; font-weight: bold;">joe94316186@gmail.com</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">💬</span>
+                        <a href="https://lin.ee/PVvkGvx" target="_blank" style="color: #06c755; text-decoration: none; font-weight: bold;">
+                            官方 LINE 連結 (ID: @411bydbx)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-mode" class="card" style="display: none;">
+            <div class="title-main" id="mode-title"></div>
+            <div class="subtitle-main">請選擇學習模式</div>
+            <div class="grid-2col">
+                <div class="btn-card" onclick="app.startReadingMode()">
+                    <h3 style="color: #16a34a;">📖 閱讀模式</h3>
+                    <p>完整題庫總覽，適合背誦</p>
+                </div>
+                <div class="btn-card" onclick="app.showQuizOptions()">
+                    <h3 style="color: #ea580c;">📝 測驗模式</h3>
+                    <p>隨機抽題，實戰模擬</p>
+                </div>
+            </div>
+            <button class="btn btn-outline" style="margin-top: 10px;" onclick="app.goHome()">返回上一步</button>
+        </div>
+
+        <div id="screen-quiz-options" class="card" style="display: none;">
+            <div class="title-main">測驗設定</div>
+            <div class="subtitle-main">系統將依據您選擇的類別提供適合的題數</div>
+            <div id="quiz-options-container" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            <button class="btn btn-outline" style="margin-top: 15px;" onclick="app.goModeSelect()">返回上一步</button>
+        </div>
+
+        <div id="screen-reading" style="display: none;">
+            <div class="card" style="padding: 15px; margin-bottom: 15px;">
+                <h2 style="margin:0; font-size:1.4rem;">📖 題庫總覽</h2>
+                <p style="margin:5px 0 0 0; color:var(--text-muted);">請直接向下滑動背誦正確解答</p>
+            </div>
+            <div id="reading-content"></div>
+        </div>
+
+        <div id="screen-quiz" class="card" style="display: none;">
+            <div style="display: flex; justify-content: space-between; font-weight: bold; color: var(--text-muted); margin-bottom: 8px;">
+                <span id="q-progress">進度: 0/0</span>
+                <span id="q-score" style="color: var(--success);">答對: 0</span>
+            </div>
+            <div class="progress-bar-bg"><div id="q-bar" class="progress-bar-fill"></div></div>
+            <div class="q-meta" id="q-meta">載入中...</div>
+            <div class="q-text" id="q-text">題目載入中...</div>
+            <div id="q-options"></div>
+            <button id="q-btn" class="btn btn-primary" style="margin-top: 25px;" disabled onclick="app.handleQuizAction()">確認答案</button>
+        </div>
+
+        <div id="screen-result" class="card" style="display: none;">
+            <div class="title-main">測驗結束</div>
+            <div style="font-size: 4rem; font-weight: 900; color: var(--primary); text-align: center; margin: 20px 0;" id="res-percent">0%</div>
+            <div class="subtitle-main" id="res-stats">答對 0 題 / 共 0 題</div>
+            <div id="res-mistakes" style="margin-top: 30px;">
+                <h3 style="color: var(--danger); border-bottom: 2px solid var(--border); padding-bottom: 10px;">錯誤題目訂正</h3>
+                <div id="res-mistakes-list"></div>
+            </div>
+            <button class="btn btn-primary" style="margin-top: 30px;" onclick="app.goHome()">回首頁</button>
+        </div>
+    </div>
+
+    <div style="max-width: 800px; margin: 30px auto 20px; padding: 0 15px; text-align: justify; font-size: 0.8rem; color: #64748b; line-height: 1.7;">
+        <div style="margin-bottom: 12px;">
+            <a href="./about.html" style="color:#0284c7; margin-right:12px;">關於本站</a>
+            <a href="./contact.html" style="color:#0284c7; margin-right:12px;">聯絡我們</a>
+            <a href="./sources.html" style="color:#0284c7; margin-right:12px;">資料來源</a>
+            <a href="./privacy.html" style="color:#0284c7; margin-right:12px;">隱私權政策</a>
+            <a href="./disclaimer.html" style="color:#0284c7; margin-right:12px;">免責聲明</a>
+            <a href="./sitemap.xml" style="color:#0284c7;">網站地圖</a>
+        </div>
+        <strong style="color: #64748b;">【免責聲明與隱私權政策 Privacy Policy】</strong><br>
+        1. 本網站為私人架設之免費測驗工具，題庫內容均取自交通部民用航空局公開資料，僅供練習參考。本站不對資料之絕對即時性負責，實際考驗標準請依官方最新公告為準。<br>
+        2. <b>網站分析與 Cookie：</b> 本站可能使用網站主機紀錄、Google Analytics 或其他統計工具了解頁面瀏覽、閱讀模式、測驗開始、測驗完成與外部連結點擊等匿名化互動資料。<br>
+        3. <b>第三方廣告與聯盟連結：</b> 本站可能放置第三方廣告、聯盟行銷連結或合作推薦內容。外部網站的資料處理、Cookie 與交易規則，請以該服務提供者之政策為準。
+    </div>
+
+    <script src="./data_normal.js"></script>
+    <script src="./data_pro.js"></script>
+    <script src="./data_normal_renew.js"></script>
+    <script src="./data_pro_renew.js"></script>
+    
+    <script>
+        window.siteAnalyticsConfig = {
+            gaMeasurementId: 'G-3WQQS2HF5D',
+            debug: false
+        };
+
+        (function() {
+            const config = window.siteAnalyticsConfig || {};
+            const measurementId = String(config.gaMeasurementId || '').trim();
+
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = window.gtag || function() {
+                window.dataLayer.push(arguments);
+            };
+
+            if (!measurementId) return;
+
+            const gaScript = document.createElement('script');
+            gaScript.async = true;
+            gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`;
+            document.head.appendChild(gaScript);
+
+            window.gtag('js', new Date());
+            window.gtag('config', measurementId, {
+                anonymize_ip: true
+            });
+        })();
+
+        function trackEvent(name, params = {}) {
+            const cleanParams = Object.assign({
+                page_path: window.location.pathname
+            }, params);
+
+            if (window.siteAnalyticsConfig && window.siteAnalyticsConfig.debug) {
+                console.info('[analytics]', name, cleanParams);
+            }
+
+            if (typeof window.gtag === 'function' && window.siteAnalyticsConfig.gaMeasurementId) {
+                window.gtag('event', name, cleanParams);
+            }
+        }
+
+        (function() {
+            const savedMode = localStorage.getItem('darkMode');
+            if (savedMode === 'true') {
+                document.body.classList.remove('light-mode');
+                document.body.classList.add('dark-mode');
+            }
+        })();
+
+        const categoryConfigs = {
+            'normal': { title: '普通操作證', db: null, counts: [20, 40, 60] },
+            'pro': { title: '專業操作證', db: null, counts: [40, 80, 120] },
+            'normal_renew': { title: '屆期換證 (簡易)', db: null, counts: [20, 40, 60] },
+            'pro_renew': { title: '屆期換證 (完整)', db: null, counts: [40, 80, 120] }
+        };
+
+        const app = {
+            currentCategory: '',
+            currentDB: null,
+            quizQuestions: [],
+            qIndex: 0, qCorrect: 0, qWrongList: [], qSelected: null, qState: 'waiting',
+            readingTrackedDepths: new Set(),
+
+            toggleDarkMode: function() {
+                const isDark = document.body.classList.toggle('dark-mode');
+                if (isDark) {
+                    document.body.classList.remove('light-mode');
+                } else {
+                    document.body.classList.add('light-mode');
+                }
+                localStorage.setItem('darkMode', isDark);
+                this.updateDarkModeButton(isDark);
+                trackEvent('theme_toggle', { theme: isDark ? 'dark' : 'light' });
+            },
+
+            updateDarkModeButton: function(isDark) {
+                const btn = document.getElementById('dark-mode-btn');
+                if (btn) {
+                    // 已更新為更專業的 深色/淺色 命名
+                    btn.innerText = isDark ? "☀️ 淺色模式" : "🌙 深色模式";
+                }
+            },
+
+            hideAllScreens: function() {
+                ['screen-home', 'screen-mode', 'screen-quiz-options', 'screen-reading', 'screen-quiz', 'screen-result'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+                if (this._readingProgressHandler) {
+                    window.removeEventListener('scroll', this._readingProgressHandler);
+                    this._readingProgressHandler = null;
+                }
+            },
+            goHome: function() { window.scrollTo(0,0); this.hideAllScreens(); document.getElementById('screen-home').style.display = 'block'; trackEvent('screen_view', { screen_name: 'home' }); },
+            goModeSelect: function() { this.hideAllScreens(); document.getElementById('screen-mode').style.display = 'block'; trackEvent('screen_view', { screen_name: 'mode_select', question_bank: this.currentCategory }); },
+            selectCategory: function(cat) {
+                this.currentCategory = cat;
+                try {
+                    categoryConfigs['normal'].db = dataNormal;
+                    categoryConfigs['pro'].db = dataPro;
+                    categoryConfigs['normal_renew'].db = dataNormalRenew;
+                    categoryConfigs['pro_renew'].db = dataProRenew;
+                    this.currentDB = categoryConfigs[cat].db;
+                    document.getElementById('mode-title').innerText = categoryConfigs[cat].title;
+                    trackEvent('question_bank_select', {
+                        question_bank: cat,
+                        question_bank_label: categoryConfigs[cat].title,
+                        question_count: Object.keys(this.currentDB.data || {}).length
+                    });
+                    this.goModeSelect();
+                } catch(e) { alert("⚠️ 題庫檔案遺失！"); }
+            },
+            showQuizOptions: function() {
+                this.hideAllScreens();
+                const counts = categoryConfigs[this.currentCategory].counts;
+                const container = document.getElementById('quiz-options-container');
+                if (!container) return;
+                container.innerHTML = '';
+                counts.forEach((num, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = (index === counts.length - 1) ? 'btn btn-primary' : 'btn btn-outline';
+                    let labelText = `測驗 ${num} 題`;
+                    if (index === 0) labelText += ' (快速模擬)';
+                    if (index === counts.length - 1) labelText += ' (完整挑戰)';
+                    btn.innerText = labelText;
+                    btn.onclick = () => this.startQuiz(num);
+                    container.appendChild(btn);
+                });
+                document.getElementById('screen-quiz-options').style.display = 'block';
+                trackEvent('quiz_options_view', { question_bank: this.currentCategory });
+            },
+            startReadingMode: function() {
+                this.hideAllScreens();
+                document.getElementById('screen-reading').style.display = 'block';
+                const container = document.getElementById('reading-content');
+                if (!container) return;
+                container.innerHTML = ''; 
+                const questionKeys = Object.keys(this.currentDB.data);
+                questionKeys.forEach((key) => {
+                    const qData = this.currentDB.data[key];
+                    let chapterName = (this.currentDB.sectionTitle && this.currentDB.sectionTitle["s" + qData.section]) 
+                        ? `第 ${qData.section} 章 - ${this.currentDB.sectionTitle["s" + qData.section]}` : "題庫預覽";
+                    let html = `<div class="read-card"><div style="font-size: 0.85rem; color: var(--primary); font-weight: bold; margin-bottom: 8px;">${chapterName} (題號: ${qData.number})</div><div class="read-q">${qData.description}</div>`;
+                    ['a', 'b', 'c', 'd'].forEach(opt => {
+                        if (!qData.options[opt]) return;
+                        let isCorrect = (opt === qData.answer);
+                        html += `<div class="${isCorrect ? 'read-opt read-correct' : 'read-opt'}">(${opt.toUpperCase()}) ${qData.options[opt]}</div>`;
+                    });
+                    html += `</div>`;
+                    container.insertAdjacentHTML('beforeend', html);
+                });
+                window.scrollTo(0,0);
+                this.readingTrackedDepths = new Set();
+                this.bindReadingProgress();
+                trackEvent('reading_mode_start', {
+                    question_bank: this.currentCategory,
+                    question_count: questionKeys.length
+                });
+            },
+            startQuiz: function(num) {
+                const quizScreen = document.getElementById('screen-quiz');
+                if (!quizScreen) return;
+                this.hideAllScreens();
+                quizScreen.style.display = 'block';
+                
+                const allKeys = Object.keys(this.currentDB.data);
+                
+                for (let i = allKeys.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [allKeys[i], allKeys[j]] = [allKeys[j], allKeys[i]]; 
+                }
+                
+                const finalNum = Math.min(num, allKeys.length);
+                this.quizQuestions = allKeys.slice(0, finalNum);
+                
+                this.qIndex = 0; 
+                this.qCorrect = 0; 
+                this.qWrongList = [];
+                trackEvent('quiz_start', {
+                    question_bank: this.currentCategory,
+                    requested_question_count: num,
+                    question_count: this.quizQuestions.length
+                });
+                this.loadQuestion();
+            },
+            loadQuestion: function() {
+                this.qState = 'waiting'; this.qSelected = null;
+                const btn = document.getElementById('q-btn');
+                const progressSpan = document.getElementById('q-progress');
+                const scoreSpan = document.getElementById('q-score');
+                const barFill = document.getElementById('q-bar');
+                const metaDiv = document.getElementById('q-meta');
+                const textDiv = document.getElementById('q-text');
+                const optContainer = document.getElementById('q-options');
+
+                if (!btn || !progressSpan || !scoreSpan || !barFill || !metaDiv || !textDiv || !optContainer) return;
+
+                btn.innerText = "確認答案"; btn.disabled = true;
+                progressSpan.innerText = `進度: ${this.qIndex + 1} / ${this.quizQuestions.length}`;
+                scoreSpan.innerText = `答對: ${this.qCorrect}`;
+                barFill.style.width = `${(this.qIndex / this.quizQuestions.length) * 100}%`;
+                const qData = this.currentDB.data[this.quizQuestions[this.qIndex]];
+                metaDiv.innerText = (this.currentDB.sectionTitle && this.currentDB.sectionTitle["s" + qData.section]) ? `第 ${qData.section} 章 - ${this.currentDB.sectionTitle["s" + qData.section]}` : "模擬測驗";
+                textDiv.innerText = qData.description;
+                optContainer.innerHTML = '';
+                ['a', 'b', 'c', 'd'].forEach(opt => {
+                    if (!qData.options[opt]) return;
+                    const label = document.createElement('label'); label.className = 'opt-label'; label.id = `opt-${opt}`;
+                    const radio = document.createElement('input'); radio.type = 'radio'; radio.name = 'quiz-opt';
+                    radio.onclick = () => { if(this.qState === 'waiting') { this.qSelected = opt; btn.disabled = false; } };
+                    label.appendChild(radio); label.appendChild(document.createTextNode(`(${opt.toUpperCase()}) ${qData.options[opt]}`));
+                    optContainer.appendChild(label);
+                });
+            },
+            handleQuizAction: function() {
+                if (this.qState === 'waiting') {
+                    const qData = this.currentDB.data[this.quizQuestions[this.qIndex]];
+                    document.querySelectorAll('.opt-label').forEach(el => el.classList.add('disabled'));
+                    const correctOpt = document.getElementById(`opt-${qData.answer}`);
+                    if (correctOpt) correctOpt.classList.add('is-correct');
+                    if (this.qSelected === qData.answer) { 
+                        this.qCorrect++; 
+                    } else {
+                        const selectedOpt = document.getElementById(`opt-${this.qSelected}`);
+                        if (selectedOpt) selectedOpt.classList.add('is-wrong');
+                        this.qWrongList.push({ data: qData, userPicked: this.qSelected });
+                    }
+                    trackEvent('quiz_answer', {
+                        question_bank: this.currentCategory,
+                        question_number: qData.number,
+                        question_section: qData.section,
+                        question_index: this.qIndex + 1,
+                        is_correct: this.qSelected === qData.answer,
+                        selected_option: this.qSelected,
+                        correct_option: qData.answer
+                    });
+                    this.qState = 'answered';
+                    const btn = document.getElementById('q-btn');
+                    if (btn) btn.innerText = (this.qIndex === this.quizQuestions.length - 1) ? "查看測驗結果" : "下一題";
+                } else {
+                    this.qIndex++; (this.qIndex < this.quizQuestions.length) ? this.loadQuestion() : this.showResult();
+                }
+            },
+            showResult: function() {
+                const resultScreen = document.getElementById('screen-result');
+                const percentDiv = document.getElementById('res-percent');
+                const statsDiv = document.getElementById('res-stats');
+                const mistakesContainer = document.getElementById('res-mistakes');
+                const list = document.getElementById('res-mistakes-list');
+
+                if (!resultScreen || !percentDiv || !statsDiv || !mistakesContainer || !list) return;
+
+                this.hideAllScreens(); resultScreen.style.display = 'block'; window.scrollTo(0,0);
+                const total = this.quizQuestions.length; const percent = Math.round((this.qCorrect / total) * 100);
+                percentDiv.innerText = `${percent}%`;
+                statsDiv.innerText = `答對 ${this.qCorrect} 題 / 共 ${total} 題`;
+                trackEvent('quiz_complete', {
+                    question_bank: this.currentCategory,
+                    question_count: total,
+                    correct_count: this.qCorrect,
+                    wrong_count: this.qWrongList.length,
+                    score_percent: percent
+                });
+                if (this.qWrongList.length === 0) { mistakesContainer.style.display = 'none'; } else {
+                    mistakesContainer.style.display = 'block'; list.innerHTML = '';
+                    this.qWrongList.forEach(item => {
+                        const box = document.createElement('div'); box.className = 'read-card'; box.style.borderLeft = '4px solid var(--danger)';
+                        let html = `<div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">第 ${item.data.section} 章</div><div style="font-weight: 700; margin-bottom: 12px; font-size:1.1rem;">${item.data.description}</div>`;
+                        ['a', 'b', 'c', 'd'].forEach(opt => {
+                            if (!item.data.options[opt]) return;
+                            let isCorrect = (opt === item.data.answer); let isUser = (opt === item.userPicked);
+                            html += `<div style="color: ${isCorrect ? 'var(--success)' : (isUser ? 'var(--danger)' : 'var(--text-muted)')}; font-weight: ${isCorrect ? 'bold' : 'normal'}; ${isUser && !isCorrect ? 'text-decoration: line-through;' : ''} margin-bottom: 6px;">(${opt.toUpperCase()}) ${item.data.options[opt]}</div>`;
+                        });
+                        box.innerHTML = html; list.appendChild(box);
+                    });
+                }
+            },
+
+            bindReadingProgress: function() {
+                const thresholds = [25, 50, 75, 100];
+                const handleScroll = () => {
+                    const doc = document.documentElement;
+                    const maxScroll = Math.max(1, doc.scrollHeight - window.innerHeight);
+                    const percent = Math.min(100, Math.round((window.scrollY / maxScroll) * 100));
+                    thresholds.forEach((threshold) => {
+                        if (percent >= threshold && !this.readingTrackedDepths.has(threshold)) {
+                            this.readingTrackedDepths.add(threshold);
+                            trackEvent('reading_progress', {
+                                question_bank: this.currentCategory,
+                                scroll_percent: threshold
+                            });
+                        }
+                    });
+                };
+
+                window.removeEventListener('scroll', this._readingProgressHandler);
+                this._readingProgressHandler = handleScroll;
+                window.addEventListener('scroll', handleScroll, { passive: true });
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const isDark = document.body.classList.contains('dark-mode');
+            app.updateDarkModeButton(isDark);
+
+            document.addEventListener('click', function(event) {
+                const link = event.target.closest('a[href]');
+                if (!link) return;
+
+                const url = new URL(link.href, window.location.href);
+                const isExternal = url.origin !== window.location.origin;
+                const isAffiliate = link.dataset.track === 'affiliate_click' || link.classList.contains('affiliate-link');
+                const isSponsor = link.dataset.track === 'sponsor_click' || link.classList.contains('sponsor-link');
+
+                if (!isExternal && !isAffiliate && !isSponsor) return;
+
+                trackEvent(isAffiliate ? 'affiliate_click' : (isSponsor ? 'sponsor_click' : 'outbound_click'), {
+                    link_url: url.href,
+                    link_text: link.innerText.trim().slice(0, 80),
+                    placement: link.dataset.placement || 'site_link'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
