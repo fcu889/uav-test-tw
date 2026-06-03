@@ -1,10 +1,13 @@
 # Changelog
 
-## Unreleased
+## v1.0.0 - 2026-06-04
 
 - Open-sourced the static site source for GitHub maintenance.
 - Added README, contribution guide, security policy, license, issue templates, CODEOWNERS, and validation workflow.
 - Added basic validation for core pages, sitemap, canonical URLs, and question-bank data structure.
+- Linked Netlify production deployment to the GitHub `main` branch.
+- Documented live usage, question-bank coverage, validation workflow, and maintainer automation opportunities.
+- Added a public GitHub source link to the website about page.
 
 ## 2026-06-01
 

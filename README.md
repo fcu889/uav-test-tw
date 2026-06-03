@@ -1,68 +1,119 @@
-# 全國無人機測驗中心
+# Taiwan UAV Exam Practice Site
 
-台灣無人機操作證學科題庫與模擬測驗網站，提供普通操作證、專業操作證、屆期換證題庫練習、靜態題庫頁、考照指南、法規整理與飛行安全文章。
+[![Netlify Status](https://api.netlify.com/api/v1/badges/b6885906-016e-4ff7-ad1d-f8b6f6f5a3c9/deploy-status)](https://app.netlify.com/projects/uav-test-tw/deploys)
 
-Live site: https://uav-test-tw.netlify.app
+Public static website for Taiwan UAV remote pilot exam study, question-bank practice, and drone-license learning resources.
 
-## 專案內容
+- Live site: https://uav-test.tw
+- Netlify fallback: https://uav-test-tw.netlify.app
+- Repository: https://github.com/wenbo0285-crypto/uav-test-tw
+- Maintainer: [@wenbo0285-crypto](https://github.com/wenbo0285-crypto)
+- License: MIT for site code
 
-- 普通操作證模擬測驗與靜態題庫
-- 專業操作證模擬測驗與靜態題庫
-- 屆期換證複習題庫
-- 無人機考照指南、法規解析、空域判斷與安全檢查文章
-- 靜態 HTML/CSS/JavaScript 架構，可部署到 Netlify、GitHub Pages 或任何靜態網站服務
-- `sitemap.xml`、`robots.txt`、隱私權政策、免責聲明與資料來源頁
+## What This Project Provides
 
-## 維護者
+This project maintains a browser-based study site for Taiwan drone learners preparing for remote pilot exams. It includes:
 
-維護者：[@wenbo0285-crypto](https://github.com/wenbo0285-crypto)
+- ordinary certificate question-bank practice
+- professional certificate question-bank practice
+- ordinary and professional renewal question banks
+- static question-bank pages for search and review
+- exam preparation guides
+- regulation notes and airspace/safety learning content
+- source-reference, privacy, disclaimer, contact, sitemap, and robots pages
+- validation tooling for question-bank data and static site health
 
-本專案目前由 Netlify Drop 部署，原始檔由此 repository 追蹤。後續可改成 GitHub-to-Netlify 自動部署。
+## Usage And Impact
 
-## 資料來源
+The project is a public-interest learning site rather than a package library, so GitHub stars are not the main adoption signal. The stronger signal is real public website usage.
 
-題庫、法規與教學內容以公開資料整理為主，包含交通部民用航空局公開題庫、遙控無人機管理資訊系統與相關公告。正式題庫、考試資格、報名流程、費用、證照效期與法規內容，仍以主管機關最新公告為準。
+Google Analytics snapshot observed on 2026-06-04 for the previous 7 days:
 
-主要資料來源頁：`sources.html`
+- 505 active users
+- 501 new users
+- 4,118 views on the main practice page
+- 58k events
+- 635 Organic Search sessions
 
-## 本地使用
+These users are mainly finding the site through public search while preparing for Taiwan UAV exam and drone-license study workflows.
 
-這是純靜態網站。可以直接用瀏覽器開啟 `index.html`，或啟動本地靜態伺服器：
+## Question-Bank Coverage
+
+The validation script currently checks these data sets:
+
+- `data_normal.js`: 388 ordinary-certificate questions
+- `data_pro.js`: 588 professional-certificate questions
+- `data_normal_renew.js`: 120 ordinary renewal questions
+- `data_pro_renew.js`: 324 professional renewal questions
+
+## Local Development
+
+This is a static HTML/CSS/JavaScript site. It can be opened directly in a browser, or served locally:
 
 ```bash
 python -m http.server 8080
 ```
 
-然後開啟：
+Then open:
 
 ```text
 http://localhost:8080
 ```
 
-## 驗證
+## Validation
 
-執行基本靜態檔案與題庫資料驗證：
+Run the project validation before publishing changes:
 
 ```bash
 npm run validate
 ```
 
-驗證內容包含：
+The validation checks:
 
-- 核心頁面存在
-- 題庫 JS 檔案可讀取
-- 題目、選項、答案結構完整
-- `sitemap.xml` 包含主要頁面
-- Canonical URL 指向 `https://uav-test.tw`
+- core static pages exist
+- question-bank JavaScript files can be parsed
+- questions include complete option and answer structures
+- `sitemap.xml` includes key public pages
+- canonical URLs point to `https://uav-test.tw`
 
-## 維護流程
+Netlify is configured through `netlify.toml` to run this validation before publishing:
 
-1. 檢查交通部民用航空局是否發布新版題庫或法規公告。
-2. 更新資料來源、題庫資料與相關教學頁。
-3. 執行 `npm run validate`。
-4. 更新 `CHANGELOG.md`。
-5. 部署到 Netlify 並檢查線上頁面。
+```toml
+[build]
+  command = "npm run validate"
+  publish = "."
+```
 
-## 授權
+## Deployment
 
-程式碼以 MIT License 釋出。題庫、法規與官方資料來源內容各自受其原始發布單位規範；本站整理內容僅供學習與考前練習使用。
+The production site is linked to GitHub and deploys from the `main` branch through Netlify. Pushing to `main` triggers a production deploy after validation passes.
+
+## Maintenance Workflow
+
+1. Check whether Taiwan CAA or the remote UAV management system has published updated question banks, rules, or exam process changes.
+2. Compare official updates against the local question-bank data.
+3. Update question data, source references, and related guide pages.
+4. Run `npm run validate`.
+5. Update `CHANGELOG.md` when the public site behavior or data changes.
+6. Push to `main` and verify the Netlify production deploy.
+
+## Open-Source Maintenance Opportunities
+
+This repository is a good fit for maintainer automation because the hard work is careful review of large public-data changes, not complex infrastructure. Useful automation includes:
+
+- comparing official CAA question-bank updates
+- detecting changed answers, duplicate questions, and inconsistent options
+- summarizing large data diffs for review
+- generating static question-bank pages
+- drafting changelog and release notes
+- triaging user reports about possible question or regulation discrepancies
+
+## Data Sources
+
+Question-bank and regulation content is organized from public Taiwan UAV exam and aviation-safety resources, including Taiwan CAA public information and remote UAV management references. Official eligibility, exam process, fees, certificate validity, and legal requirements should always be verified against the latest government announcements.
+
+See `sources.html` for the public source-reference page.
+
+## License
+
+Site code is released under the MIT License. Question-bank, regulation, and official-source materials remain subject to their original publishers' terms and public-information rules. This project is for study and exam-preparation support only.
